@@ -1,6 +1,6 @@
 (function($){
-  var PasswordStrength = function(options, element) {  
-    var el   = $(element);    
+  var PasswordStrength = function(options, element) {
+    var el   = $(element);
     var self = this;
   	options  = $.extend({
       container: '#password_strength',
@@ -15,7 +15,7 @@
         strong: "Great Password"
       }
     }, options || {});
-    
+
     self.countChars = function(passwordText) {
       var countResult = {
         size: passwordText.length,
@@ -35,31 +35,38 @@
       }
       return countResult;
     }
-    
+
     self.removeAllClasses = function(curContainer) {
       curContainer.removeClass(options.classes.weak).removeClass(options.classes.medium).removeClass(options.classes.strong);
     }
-    
+
+	self.isCommon = function(password) {
+	  var common = ['password','123456','12345678','qwerty','abc123','monkey','1234567','letmein','trustno1','dragon','baseball','111111','iloveyou','master','sunshine','ashley','bailey','passw0rd','shadow','123123','654321','superman','qazwsx','michael','football'];
+	  return (common.indexOf(password) >= 0);
+	}
+
     el.keyup(function(d){
-      var countResult  = self.countChars($(this).attr("value"));
+      var countResult = self.countChars($(this).attr("value"));
       var curContainer = $(options.container);
-      self.removeAllClasses(curContainer);  
+	  var commonPass = isCommon($(this).attr("value"));
+
+      self.removeAllClasses(curContainer);
       with(countResult) {
-        if (size >= 8 && otherChars >= 1) {
+        if (!commonPass && size >= 8 && otherChars >= 1) {
           curContainer.addClass(options.classes.strong);
           curContainer.text(options.messages.strong);
-        } else if (size >= 5 && letters >= 2 && numbers >= 2) {
+        } else if (!commonPass && size >= 5 && letters >= 2 && numbers >= 2) {
           curContainer.addClass(options.classes.medium);
           curContainer.text(options.messages.medium);
         } else {
-          curContainer.addClass(options.classes.weak);        
-          curContainer.text(options.messages.weak);        
-        }        
+          curContainer.addClass(options.classes.weak);
+          curContainer.text(options.messages.weak);
+        }
       }
     });
   }
-  
-	$.fn.passwordStrength = function(options) {  
+
+	$.fn.passwordStrength = function(options) {
 		return this.each(function() {
 			var element = $(this);
 			var passwordStrength = new PasswordStrength(options, element);
